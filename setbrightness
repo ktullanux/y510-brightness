@@ -1,0 +1,42 @@
+#!/bin/bash
+usage()
+{
+cat << EOF
+This script allows you to change the brightness!
+OPTIONS:
+    -h	Show this message
+    -u	+1 for the brightness
+    -d	-1 for the brightness
+EOF
+}
+
+BRIGHTNESS=$(cat /sys/class/backlight/acpi_video0/brightness)
+while getopts "hud" opt; do
+    case $opt in
+    h) 
+	usage
+	exit 1
+	;;
+    u)
+	if [ $BRIGHTNESS -lt 10 ]; then
+	    let RESULT=$BRIGHTNESS+1
+	    echo $RESULT > /sys/class/backlight/acpi_video0/brightness
+	    notify-send -t 2000 -i /home/ktullanux/.config/awesome/icon/bri_normal.png "BRIGHTNESS" "$RESULT"
+	else
+	    notify-send -t 5000 -u critical -i /home/ktullanux/.config/awesome/icon/bri_critical.png "STOP IT!" "THIS IS THE MAXIMUM BRIGHTNESS"
+	fi
+	;;
+    d)
+	if [ $BRIGHTNESS -gt 0 ]; then
+	    let RESULT=$BRIGHTNESS-1
+	    echo $RESULT > /sys/class/backlight/acpi_video0/brightness
+	    notify-send -t 2000 -i /home/ktullanux/.config/awesome/icon/bri_normal.png "BRIGHTNESS" "$RESULT"
+	else
+	    notify-send -t 5000 -u critical -i /home/ktullanux/.config/awesome/icon/bri_critical.png "STOP IT!" "THIS IS THE MINIMUM BRIGHTNESS"
+	fi
+	;;
+    esac
+done
+
+
+
